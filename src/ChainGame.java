@@ -2,6 +2,8 @@ import enigma.core.Enigma;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import enigma.console.TextAttributes;
+import enigma.event.TextMouseEvent;
+import enigma.event.TextMouseListener;
 import java.awt.Color;
 import java.util.Random;
 import java.util.Scanner;
@@ -9,14 +11,30 @@ import java.util.Scanner;
 public class ChainGame {
     public static enigma.console.Console cn = Enigma.getConsole("Chain",75,21,15);
     public KeyListener klis;
+    public TextMouseListener tmlis;
+
     Scanner sc = new Scanner(System.in);
     TextAttributes green = new TextAttributes(Color.GREEN, Color.BLACK);
     // ------ Standard variables for keyboard ------
     public int keypr;   // key pressed?
     public int rkey;    // key   (for press/release)
+    public int mousepr;          // mouse pressed?
+    public int mousex, mousey;   // mouse text coords.
     // ----------------------------------------------------
     ChainGame() throws Exception {   // --- Contructor
         // ------ Standard code for mouse and keyboard ------ Do not change
+        tmlis=new TextMouseListener() {
+            public void mouseClicked(TextMouseEvent arg0) {}
+            public void mousePressed(TextMouseEvent arg0) {
+                if(mousepr==0) {
+                    mousepr=1;
+                    mousex=arg0.getX();
+                    mousey=arg0.getY();
+                }
+            }
+            public void mouseReleased(TextMouseEvent arg0) {}
+        };
+        cn.getTextWindow().addTextMouseListener(tmlis);
 
         klis=new KeyListener() {
             public void keyTyped(KeyEvent e) {}
@@ -29,26 +47,27 @@ public class ChainGame {
             public void keyReleased(KeyEvent e) {}
         };
         cn.getTextWindow().addKeyListener(klis);
+        // ----------------------------------------------------
 
         int score = 0;
         int round = 1;
         boolean gameOver = false;
-        System.out.print(" 0: Play \n 1: Enter seed \n 2: View high score table \n Enter your choice: ");
-        int choice = 0;
+        System.out.print(" 1: Play \n 2: Enter seed \n 3: View high score table \n Enter your choice: ");
+        int choice = 1;
         try {
             choice = sc.nextInt();
         }
         catch(Exception e) {}
 
         int seed = 0;
-        if(choice==1) {
+        if(choice==2) {
             System.out.print(" Please enter a seed(integer) for the board: ");
             try {
                 seed = sc.nextInt();
             }
             catch(Exception e) {}
         }
-        if(choice==2) {
+        if(choice==3) {
             //displayHST(); high-score table
         }
 
@@ -91,6 +110,13 @@ public class ChainGame {
         cn.getTextWindow().output("Table:");
 
         while(!gameOver) {
+
+            if(mousepr==1) {  // if mouse button pressed
+                cn.getTextWindow().output(mousex,mousey,'#');  // write a char to x,y position without changing cursor position
+                px=mousex; py=mousey;
+
+                mousepr=0;     // last action
+            }
 
             if(keypr==1) {    // if keyboard button pressed
                 xdir=0;
