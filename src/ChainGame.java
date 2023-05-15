@@ -18,11 +18,16 @@ public class ChainGame {
     // ------ Standard variables for keyboard ------
     public int keypr;   // key pressed?
     public int rkey;    // key   (for press/release)
+    /*
+                Mouse ile ilgili çalışmaları yap
+
     public int mousepr;          // mouse pressed?
     public int mousex, mousey;   // mouse text coords.
+     */
     // ----------------------------------------------------
     ChainGame() throws Exception {   // --- Contructor
         // ------ Standard code for mouse and keyboard ------ Do not change
+       /*
         tmlis=new TextMouseListener() {
             public void mouseClicked(TextMouseEvent arg0) {}
             public void mousePressed(TextMouseEvent arg0) {
@@ -35,6 +40,8 @@ public class ChainGame {
             public void mouseReleased(TextMouseEvent arg0) {}
         };
         cn.getTextWindow().addTextMouseListener(tmlis);
+
+        */
 
         klis=new KeyListener() {
             public void keyTyped(KeyEvent e) {}
@@ -61,7 +68,7 @@ public class ChainGame {
 
         int seed = 0;
         if(choice==2) {
-            System.out.print(" Please enter a seed(integer) for the board: ");
+            System.out.print(" Please enter a seed(integer) for the board: "); //Player select a seed of random
             try {
                 seed = sc.nextInt();
             }
@@ -83,6 +90,7 @@ public class ChainGame {
 
         boolean moved = false;
 
+        //Create Game Area
         char[][] gamezone = new char [19][31];
         ChainSLL chain = new ChainSLL();
 
@@ -95,7 +103,6 @@ public class ChainGame {
                 cn.getTextWindow().output(j, i, gamezone[i][j]);
             }
         }
-
         cn.getTextWindow().output(px, py, 'P', green);
 
         cn.getTextWindow().setCursorPosition(35, 0);
@@ -110,6 +117,8 @@ public class ChainGame {
         cn.getTextWindow().output("Table:");
 
         while(!gameOver) {
+/*
+            Mouse ile ilgili çalışmaları yap
 
             if(mousepr==1) {  // if mouse button pressed
                 cn.getTextWindow().output(mousex,mousey,'#');  // write a char to x,y position without changing cursor position
@@ -117,7 +126,7 @@ public class ChainGame {
 
                 mousepr=0;     // last action
             }
-
+*/
             if(keypr==1) {    // if keyboard button pressed
                 xdir=0;
                 ydir=0;
@@ -138,7 +147,7 @@ public class ChainGame {
                     }
                 }
                 else if(rkey==KeyEvent.VK_ENTER) {
-                    int edgeC = 0;
+                    int edgeC = 0; //chain number
                     for(int i=0; i<19; i++) {
                         for(int j=0; j<31; j++) {
                             if(i%2==1 && j%2==1 && gamezone[i][j] == '+')
