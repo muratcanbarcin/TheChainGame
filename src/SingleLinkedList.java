@@ -1,5 +1,5 @@
 
-public class ChainSLL {
+public class SingleLinkedList {
 
     private Node head;
 
