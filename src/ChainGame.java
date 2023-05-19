@@ -196,11 +196,32 @@ public class ChainGame {
                     cn.getTextWindow().output("Size: "+chain.size());
                     cn.getTextWindow().setCursorPosition(45, 12);
                     displaySLL(); // order is wrong, displays row to row, not linked
+                    cn.getTextWindow().setCursorPosition(45, 4);
+                    displayMLL();
+
 
                     // calculate score and make chain into dots on board, add to table
-                    if(!gameOver) score += chain.size()*chain.size();
-                    round++;
+                    if(!gameOver) {
+                        score += chain.size()*chain.size();
+                        table.addColumn(Integer.toString(round));
+                        for(int add =0; add<chain.size();add++){
+                            Node temp = chain.head;
+                            while (temp != null)
+                            {
+                                table.addItem(Integer.toString(round),temp.getData().toString());
+                                temp = temp.getLink();
+                            }
+                        }
+                        round++;
+                    }
+                    else {
+                        clear();
+                        cn.getTextWindow().setCursorPosition(0, 0);
+                        cn.getTextWindow().output("GAME OVER");
+                        break;
+                    }
                 }
+
 
                 if(gamezone[py+ydir][px+xdir] == ' ' && (xdir != 0 || ydir != 0)) {
                     px+=xdir; py+=ydir;
@@ -234,10 +255,7 @@ public class ChainGame {
 
         }
 
-        cn.getTextWindow().setCursorPosition(35, 16);
-        cn.getTextWindow().output("Error in chain");
-        cn.getTextWindow().setCursorPosition(35, 17);
-        cn.getTextWindow().output("- Game Over -");
+
 
     }
 
@@ -245,9 +263,10 @@ public class ChainGame {
         for (int i = 0; i < 100; i++) {
             for (int j = 0; j < 100; j++) {
                 cn.getTextWindow().setCursorPosition(i,j);
-                cn.getTextWindow().output(' ');
+                cn.getTextWindow().output(" ");
             }
         }
+        cn.getTextWindow().setCursorPosition(0,0);
     }
 
     public void displayMLL(){
@@ -286,10 +305,10 @@ public class ChainGame {
         DLLNode currentNode = HST.head;
 
         while (currentNode != null) {
-            System.out.print(currentNode.getData() + " ");
+            cn.getTextWindow().output(currentNode.getData() + " ");
             currentNode = currentNode.getNext();
         }
-        System.out.println();
+        cn.getTextWindow().output("\n");
     }
 
 
