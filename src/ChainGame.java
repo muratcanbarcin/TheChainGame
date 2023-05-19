@@ -59,7 +59,7 @@ public class ChainGame {
         int score = 0;
         int round = 1;
         boolean gameOver = false;
-        System.out.print(" 1: Play \n 2: Enter seed \n 3: View high score table \n Enter your choice: ");
+        cn.getTextWindow().output(" 1: Play \n 2: Enter seed \n 3: View high score table \n Enter your choice: ");
         int choice = 1;
         try {
             choice = sc.nextInt();
@@ -68,7 +68,9 @@ public class ChainGame {
 
         int seed = 0;
         if(choice==2) {
-            System.out.print(" Please enter a seed(integer) for the board: "); //Player select a seed of random
+            clear();
+            cn.getTextWindow().setCursorPosition(0,0);
+            cn.getTextWindow().output(" Please enter a seed(integer) for the board: "); //Player select a seed of random
             try {
                 seed = sc.nextInt();
             }
@@ -92,7 +94,7 @@ public class ChainGame {
 
         //Create Game Area
         char[][] gamezone = new char [19][31];
-        ChainSLL chain = new ChainSLL();
+        SingleLinkedList chain = new SingleLinkedList();
 
         //   Player p = new Player(px, py);
 
@@ -188,7 +190,7 @@ public class ChainGame {
                     if(chain.size() < 4) gameOver = true; // size insufficient
 
                     cn.getTextWindow().setCursorPosition(45, 11);
-                    System.out.print("Size: "+chain.size());
+                    cn.getTextWindow().output("Size: "+chain.size());
                     cn.getTextWindow().setCursorPosition(45, 12);
                     chain.display(); // order is wrong, displays row to row, not linked
 
@@ -221,9 +223,9 @@ public class ChainGame {
             }
 
             cn.getTextWindow().setCursorPosition(47, 1);
-            System.out.print(round);
+            cn.getTextWindow().output(round +" ");
             cn.getTextWindow().setCursorPosition(47, 2);
-            System.out.print(score);
+            cn.getTextWindow().output(score+ " ");
 
             Thread.sleep(50);
 
@@ -234,6 +236,14 @@ public class ChainGame {
         cn.getTextWindow().setCursorPosition(35, 17);
         cn.getTextWindow().output("- Game Over -");
 
+    }
+
+    public void clear() {
+        for (int i = 0; i < 100; i++) {
+            for (int j = 0; j < 100; j++) {
+                cn.getTextWindow().output(' ');
+            }
+        }
     }
 
 }
