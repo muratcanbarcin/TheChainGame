@@ -1,4 +1,4 @@
-public class TableMLL {
+public class MultiLinkedList {
     ColumnNode head;
 
     public void addColumn(String dataToAdd){
@@ -59,24 +59,4 @@ public class TableMLL {
         }
         return count;
     }
-
-    public void display(){
-        if(head == null)
-            System.out.println("linked list is empty");
-        else {
-            ColumnNode temp = head;
-            while (temp != null) {
-                System.out.print(temp.getFirstItem());
-                RowNode temp2 = temp.getRight();
-                while (temp2 != null) {
-                    System.out.print(temp2.getItemName() + "+");
-                    temp2 = temp2.getNext();
-                }
-                System.out.println();
-                temp=temp.getDown();
-                System.out.println("+");
-            }
-        }
-    }
-
 }

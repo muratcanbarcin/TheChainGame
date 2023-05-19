@@ -1,5 +1,5 @@
 public class DoubleLinkedList {
-    private DLLNode head;
+    public DLLNode head;
     private DLLNode tail;
     private int size;
 
@@ -16,16 +16,6 @@ public class DoubleLinkedList {
         }
 
         size++;
-    }
-
-    public void display() {
-        DLLNode currentNode = head;
-
-        while (currentNode != null) {
-            System.out.print(currentNode.getData() + " ");
-            currentNode = currentNode.getNext();
-        }
-        System.out.println();
     }
 
     public int count() {

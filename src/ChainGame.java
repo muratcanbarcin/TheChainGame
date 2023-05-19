@@ -10,8 +10,12 @@ import java.util.Scanner;
 
 public class ChainGame {
     public static enigma.console.Console cn = Enigma.getConsole("Chain",75,21,15);
+    public static SingleLinkedList chain = new SingleLinkedList();
+    public static DoubleLinkedList HST =new DoubleLinkedList();
+    public static MultiLinkedList table = new MultiLinkedList();
     public KeyListener klis;
     public TextMouseListener tmlis;
+
 
     Scanner sc = new Scanner(System.in);
     TextAttributes green = new TextAttributes(Color.GREEN, Color.BLACK);
@@ -94,7 +98,6 @@ public class ChainGame {
 
         //Create Game Area
         char[][] gamezone = new char [19][31];
-        SingleLinkedList chain = new SingleLinkedList();
 
         //   Player p = new Player(px, py);
 
@@ -192,7 +195,7 @@ public class ChainGame {
                     cn.getTextWindow().setCursorPosition(45, 11);
                     cn.getTextWindow().output("Size: "+chain.size());
                     cn.getTextWindow().setCursorPosition(45, 12);
-                    chain.display(); // order is wrong, displays row to row, not linked
+                    displaySLL(); // order is wrong, displays row to row, not linked
 
                     // calculate score and make chain into dots on board, add to table
                     if(!gameOver) score += chain.size()*chain.size();
@@ -241,9 +244,53 @@ public class ChainGame {
     public void clear() {
         for (int i = 0; i < 100; i++) {
             for (int j = 0; j < 100; j++) {
+                cn.getTextWindow().setCursorPosition(i,j);
                 cn.getTextWindow().output(' ');
             }
         }
     }
+
+    public void displayMLL(){
+        if(table.head == null)
+            cn.getTextWindow().output("linked list is empty");
+        else {
+            ColumnNode temp = table.head;
+            while (temp != null) {
+                cn.getTextWindow().output(temp.getFirstItem());
+                RowNode temp2 = temp.getRight();
+                while (temp2 != null) {
+                    cn.getTextWindow().output(temp2.getItemName() + "+");
+                    temp2 = temp2.getNext();
+                }
+                temp=temp.getDown();
+                cn.getTextWindow().output("\n + \n");
+            }
+        }
+    }
+
+    public void displaySLL()
+    {
+        if(chain.head == null)
+            cn.getTextWindow().output("linked list is empty");
+        else {
+            Node temp = chain.head;
+            while (temp != null)
+            {
+                cn.getTextWindow().output(temp.getData() + " ");
+                temp = temp.getLink();
+            }
+        }
+    }
+
+    public void displayDLL() {
+        DLLNode currentNode = HST.head;
+
+        while (currentNode != null) {
+            System.out.print(currentNode.getData() + " ");
+            currentNode = currentNode.getNext();
+        }
+        System.out.println();
+    }
+
 
 }

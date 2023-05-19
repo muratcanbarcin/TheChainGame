@@ -1,7 +1,7 @@
 
 public class SingleLinkedList {
 
-    private Node head;
+    public Node head;
 
     public void add(Object dataToAdd)
     {
@@ -17,20 +17,6 @@ public class SingleLinkedList {
                 temp = temp.getLink();
             Node newnode = new Node(dataToAdd);
             temp.setLink(newnode);
-        }
-    }
-
-    public void display()
-    {
-        if(head == null)
-            System.out.println("linked list is empty");
-        else {
-            Node temp = head;
-            while (temp != null)
-            {
-                System.out.print(temp.getData() + " ");
-                temp = temp.getLink();
-            }
         }
     }
 
