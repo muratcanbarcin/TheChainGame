@@ -14,6 +14,7 @@ public class ChainGame {
     public static SingleLinkedList chain = new SingleLinkedList();
     public static DoubleLinkedList HST =new DoubleLinkedList();
     public static MultiLinkedList table = new MultiLinkedList();
+    public static char[][] board = new  char[19][31];
     public KeyListener klis;
     Scanner sc = new Scanner(System.in);
     TextAttributes green = new TextAttributes(Color.GREEN, Color.BLACK);
@@ -22,9 +23,14 @@ public class ChainGame {
     public int keypr;   // key pressed?
     public int rkey;    // key   (for press/release)
     // ----------------------------------------------------
+
+    //Variables
     public static int score =0;
     public static int round =1;
+    public static int seed= 0;
     public static boolean gameover =false;
+    public static int px=15, py=9;
+
 
 
     public ChainGame() throws Exception{  // --- Contructor
@@ -42,9 +48,13 @@ public class ChainGame {
         };
         cn.getTextWindow().addKeyListener(klis);
         // ----------------------------------------------------
-
-
         menu();
+
+        int xdir = 0, ydir = 0;
+
+        boolean moved = false;
+
+
     }
 
     public void menu() {
@@ -91,11 +101,18 @@ public class ChainGame {
         // Seçilen seçenek üzerinde işlem yapılabilir
         switch (selectedOption) {
             case 1:
-                cn.getTextWindow().output("Play Seçildi");
                 // Play seçeneği seçildiğinde yapılacak işlemler
+
                 break;
             case 2:
                 // Settings seçeneği seçildiğinde yapılacak işlemler
+                clear();
+                cn.getTextWindow().setCursorPosition(0,0);
+                cn.getTextWindow().output("Seed:");
+                try {
+                    seed = sc.nextInt();
+                }
+                catch(Exception e) {}
                 break;
             case 3:
                 // High Score Table seçeneği seçildiğinde yapılacak işlemler
@@ -105,6 +122,21 @@ public class ChainGame {
                 break;
         }
     }
+
+    public void fillingArea() {
+
+        Random rnd = new Random(seed);
+
+        for (int i = 0; i < 19; i++) {
+            for (int j = 0; j < 31; j++) {
+                if (i % 2 == 0 && j % 2 == 0) board[i][j] = (char) (1 + rnd.nextInt(4) + '0');
+                else board[i][j] = ' ';
+            }
+        }
+        board[px][py] ='P';
+
+    }
+
 
     public void clear() {
         for (int i = 0; i < 100; i++) {
