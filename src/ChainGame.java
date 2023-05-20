@@ -2,8 +2,7 @@ import enigma.core.Enigma;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import enigma.console.TextAttributes;
-import enigma.event.TextMouseEvent;
-import enigma.event.TextMouseListener;
+
 import java.awt.Color;
 import java.util.Random;
 import java.util.Scanner;
@@ -52,10 +51,114 @@ public class ChainGame {
 
         int xdir = 0, ydir = 0;
 
-        boolean moved = false;
 
+        fillingBoard();
+
+        while (!gameover) {
+            if (keypr == 1) {    // if keyboard button pressed
+                xdir = 0;
+                ydir = 0;
+                if (rkey == KeyEvent.VK_LEFT && px > 0) xdir = -1;
+                else if (rkey == KeyEvent.VK_RIGHT && px < 30) xdir = 1;
+                else if (rkey == KeyEvent.VK_UP && py > 0) ydir = -1;
+                else if (rkey == KeyEvent.VK_DOWN && py < 18) ydir = 1;
+                else if (rkey == KeyEvent.VK_SPACE) {
+                    if (board[py][px] == '+') {
+                        board[py][px] = ' ';
+                    }
+                    else if (board[py][px] == ' ') {
+                        board[py][px] = '+';
+                    }
+                }
+            }
+            else if(rkey==KeyEvent.VK_ENTER) {
+                int edgeC = 0; //chain number
+                for(int i=0; i<19; i++) {
+                    for(int j=0; j<31; j++) {
+                        if(i%2==1 && j%2==1 && board[i][j] == '+') {
+                            gameover = true;
+                        }
+                        else if(i%2==0 && j%2==0) {
+                            int plusC = 0;
+                            if(i>0 && board[i-1][j] == '+') {
+
+                                plusC++;
+
+                            }
+                            if(i<18 && board[i+1][j] == '+') {
+
+                                plusC++;
+
+                            }
+                            if(j>0 && board[i][j-1] == '+') {
+
+                                plusC++;
+
+                            }
+                            if(j<30 && board[i][j+1] == '+') {
+
+                                plusC++;
+
+                            }
+                            if(plusC == 1) {
+                                edgeC++;
+                                chain.add(board[i][j]); // start or end
+                            }
+                            else if(plusC == 2) {
+                                chain.add(board[i][j]);
+                            }
+                            else if(plusC > 2) {
+                                gameover = true; // faulty chain
+                            }
+                        }
+                    }
+                }
+
+                if(edgeC > 2 || edgeC == 0) gameover = true; // more than 1 chain, no chain
+                if(chain.size() < 4) gameover = true; // size insufficient
+
+                //Oyun Alanı Görüntület
+
+                // calculate score and make chain into dots on board, add to table
+                if(!gameover) {
+                    score += chain.size()*chain.size();
+                    table.addColumn(Integer.toString(round));
+                    for(int add =0; add<chain.size();add++){
+                        Node temp = chain.head;
+                        while (temp != null)
+                        {
+                            table.addItem(Integer.toString(round),temp.getData().toString());
+                            temp = temp.getLink();
+                        }
+                    }
+                    round++;
+                }
+                else {
+                    clear();
+                    cn.getTextWindow().setCursorPosition(0, 0);
+                    cn.getTextWindow().output("GAME OVER");
+                    break;
+                }
+            }
+
+
+            if(board[py+ydir][px+xdir] == ' ' && (xdir != 0 || ydir != 0)) {
+                board[py][px]= ' ';
+                px+=xdir; py+=ydir;
+                board[py][px] = 'P';
+            }
+            else if(board[py+ydir][px+xdir] == '+' && (xdir != 0 || ydir != 0)) {
+                px+=xdir; py+=ydir;
+                cn.getTextWindow().output(px, py, 'P', green);
+            }
+
+
+            Thread.sleep(50);
+
+        }
 
     }
+
 
     public void menu() {
         int selectedOption = 1; // Seçili olan seçeneği tutan değişken
@@ -123,7 +226,7 @@ public class ChainGame {
         }
     }
 
-    public void fillingArea() {
+    public void fillingBoard() {
 
         Random rnd = new Random(seed);
 
