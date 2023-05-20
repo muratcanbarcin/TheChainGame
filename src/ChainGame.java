@@ -22,6 +22,10 @@ public class ChainGame {
     public int keypr;   // key pressed?
     public int rkey;    // key   (for press/release)
     // ----------------------------------------------------
+    public static int score =0;
+    public static int round =1;
+    public static boolean gameover =false;
+
 
     public ChainGame() throws Exception{  // --- Contructor
 
@@ -99,6 +103,14 @@ public class ChainGame {
             case 4:
                 // Exit seçeneği seçildiğinde yapılacak işlemler
                 break;
+        }
+    }
+
+    public void clear() {
+        for (int i = 0; i < 100; i++) {
+            for (int j = 0; j < 100; j++) {
+                cn.getTextWindow().output(' ');
+            }
         }
     }
 
