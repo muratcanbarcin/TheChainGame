@@ -26,9 +26,10 @@ public class ChainGame {
     //Variables
     public static int score =0;
     public static int round =1;
-    public static int seed= 0;
+    public static int seed= 2500;
     public static boolean gameover =false;
     public static int px=15, py=9;
+    public static int timeunit =50;
 
 
 
@@ -55,6 +56,7 @@ public class ChainGame {
         fillingBoard();
 
         while (!gameover) {
+            printScreen();
             if (keypr == 1) {    // if keyboard button pressed
                 xdir = 0;
                 ydir = 0;
@@ -135,7 +137,7 @@ public class ChainGame {
                 }
                 else {
                     clear();
-                    cn.getTextWindow().setCursorPosition(0, 0);
+                    cn.getTextWindow().setCursorPosition(0,0);
                     cn.getTextWindow().output("GAME OVER");
                     break;
                 }
@@ -153,7 +155,7 @@ public class ChainGame {
             }
 
 
-            Thread.sleep(50);
+            Thread.sleep(timeunit);
 
         }
 
@@ -205,9 +207,6 @@ public class ChainGame {
         switch (selectedOption) {
             case 1:
                 // Play seçeneği seçildiğinde yapılacak işlemler
-                clear();
-                cn.getTextWindow().setCursorPosition(0,0);
-
                 break;
             case 2:
                 // Settings seçeneği seçildiğinde yapılacak işlemler
@@ -218,12 +217,29 @@ public class ChainGame {
                     seed = sc.nextInt();
                 }
                 catch(Exception e) {}
+
+                cn.getTextWindow().output("\n \nTime Unit(25(ms)-1000(ms)):");
+                try {
+                    while (timeunit>25 && timeunit<1000)
+                    {
+                        timeunit = sc.nextInt();
+                    }
+                }
+                catch(Exception e) {}
+
                 break;
             case 3:
                 // High Score Table seçeneği seçildiğinde yapılacak işlemler
+                clear();
+                cn.getTextWindow().setCursorPosition(0,0);
+                cn.getTextWindow().output("THE UNDER CONSTRUCTION :(");
+                cn.readLine();
                 break;
             case 4:
                 // Exit seçeneği seçildiğinde yapılacak işlemler
+                clear();
+                cn.getTextWindow().setCursorPosition(0,0);
+                cn.getTextWindow().output("You Exited the Game");
                 break;
         }
     }
@@ -246,11 +262,13 @@ public class ChainGame {
         cn.getTextWindow().setCursorPosition(0, 0);
 
         for (int i = 0; i < board.length; i++) {
+            cn.getTextWindow().output("\n");
             for (int j = 0; j < board[0].length; j++) {
 
                 if (board[i][j] == 'P') {
 
                     cn.getTextWindow().output('P', new TextAttributes(Color.blue));
+
                 } else if (board[i][j] == '+') {
 
                     cn.getTextWindow().output('+', new TextAttributes(Color.white));
@@ -259,17 +277,34 @@ public class ChainGame {
                     cn.getTextWindow().output(board[i][j],new TextAttributes(Color.CYAN));
                 }
             }
+
+            /*
+
+            cn.getTextWindow().setCursorPosition(40, 0);
+            cn.getTextWindow().output("Board Seed: "+seed);
+            cn.getTextWindow().setCursorPosition(40, 1);
+            cn.getTextWindow().output("Round     : "+round);
+            cn.getTextWindow().setCursorPosition(40, 2);
+            cn.getTextWindow().output("Score     : "+score);
+            cn.getTextWindow().setCursorPosition(40, 3);
+            cn.getTextWindow().output("------------------------------------");
+            cn.getTextWindow().setCursorPosition(45, 4);
+            cn.getTextWindow().output("Table:");
+
+             */
         }
     }
 
 
     public void clear() {
-        for (int i = 0; i < 100; i++) {
-            for (int j = 0; j < 100; j++) {
+        cn.getTextWindow().setCursorPosition(0, 0);
+        for (int i = 0; i < cn.getTextWindow().getRows(); i++) {
+            for (int j = 0; j < cn.getTextWindow().getColumns(); j++) {
                 cn.getTextWindow().output(' ');
             }
         }
     }
+
 
     public void displayMLL(){
         if(table.head == null)
