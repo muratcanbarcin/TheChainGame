@@ -205,6 +205,8 @@ public class ChainGame {
         switch (selectedOption) {
             case 1:
                 // Play seçeneği seçildiğinde yapılacak işlemler
+                clear();
+                cn.getTextWindow().setCursorPosition(0,0);
 
                 break;
             case 2:
@@ -238,6 +240,26 @@ public class ChainGame {
         }
         board[px][py] ='P';
 
+    }
+
+    public void printScreen() {
+        cn.getTextWindow().setCursorPosition(0, 0);
+
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[0].length; j++) {
+
+                if (board[i][j] == 'P') {
+
+                    cn.getTextWindow().output('P', new TextAttributes(Color.blue));
+                } else if (board[i][j] == '+') {
+
+                    cn.getTextWindow().output('+', new TextAttributes(Color.white));
+                }
+                else {
+                    cn.getTextWindow().output(board[i][j],new TextAttributes(Color.CYAN));
+                }
+            }
+        }
     }
 
 
