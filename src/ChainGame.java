@@ -249,5 +249,47 @@ public class ChainGame {
         }
     }
 
+    public void displayMLL(){
+        if(table.head == null)
+            cn.getTextWindow().output("linked list is empty");
+        else {
+            ColumnNode temp = table.head;
+            while (temp != null) {
+                cn.getTextWindow().output(temp.getFirstItem());
+                RowNode temp2 = temp.getRight();
+                while (temp2 != null) {
+                    cn.getTextWindow().output(temp2.getItemName() + "+");
+                    temp2 = temp2.getNext();
+                }
+                temp=temp.getDown();
+                cn.getTextWindow().output("\n + \n");
+            }
+        }
+    }
+
+    public void displaySLL()
+    {
+        if(chain.head == null)
+            cn.getTextWindow().output("linked list is empty");
+        else {
+            Node temp = chain.head;
+            while (temp != null)
+            {
+                cn.getTextWindow().output(temp.getData() + " ");
+                temp = temp.getLink();
+            }
+        }
+    }
+
+    public void displayDLL() {
+        DLLNode currentNode = HST.head;
+
+        while (currentNode != null) {
+            cn.getTextWindow().output(currentNode.getData() + " ");
+            currentNode = currentNode.getNext();
+        }
+        cn.getTextWindow().output("\n");
+    }
+
 
 }
