@@ -1,8 +1,9 @@
-public class RowNode {
-    private String ItemName;
-    private RowNode next;
 
-    public RowNode(String dataToAdd){
+public class ItemNode {
+    private String ItemName;
+    private ItemNode next;
+
+    public ItemNode(String dataToAdd) {
         ItemName = dataToAdd;
         next = null;
     }
@@ -11,15 +12,15 @@ public class RowNode {
         return ItemName;
     }
 
-    public RowNode getNext() {
-        return next;
-    }
-
     public void setItemName(String data) {
         this.ItemName = data;
     }
 
-    public void setNext(RowNode next) {
+    public ItemNode getNext() {
+        return next;
+    }
+
+    public void setNext(ItemNode next) {
         this.next = next;
     }
 }

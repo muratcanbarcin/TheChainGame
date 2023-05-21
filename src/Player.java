@@ -11,12 +11,15 @@ public class Player {
     public int getX() {
         return x;
     }
+
     public void setX(int px) {
         this.x = px;
     }
+
     public int getY() {
         return y;
     }
+
     public void setY(int py) {
         this.y = py;
     }

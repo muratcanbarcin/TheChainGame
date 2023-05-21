@@ -1,17 +1,13 @@
 
 public class SingleLinkedList {
 
-    public Node head;
+    private Node head;
 
-    public void add(Object dataToAdd)
-    {
-        if (head == null)
-        {
+    public void add(Object dataToAdd) {
+        if (head == null) {
             Node newnode = new Node(dataToAdd);
             head = newnode;
-        }
-        else
-        {
+        } else {
             Node temp = head;
             while (temp.getLink() != null)
                 temp = temp.getLink();
@@ -20,13 +16,23 @@ public class SingleLinkedList {
         }
     }
 
-    public boolean search(Object item)
-    {
+    public void display() {
+        if (head == null)
+            System.out.println("linked list is empty");
+        else {
+            Node temp = head;
+            while (temp != null) {
+                System.out.print(temp.getData() + " ");
+                temp = temp.getLink();
+            }
+        }
+    }
+
+    public boolean search(Object item) {
         boolean flag = false;
 
         Node temp = head;
-        while (temp != null)
-        {
+        while (temp != null) {
             if (item == temp.getData())
                 flag = true;
             temp = temp.getLink();
@@ -35,15 +41,34 @@ public class SingleLinkedList {
         return flag;
     }
 
-    public int size()
-    {
+    public Object findData(int a) {
+        Object data=null;
+        if(head==null) {
+            System.out.println(" ");
+        }
+        else {
+            Node temp=head;
+            for (int i = 0; i < a; i++) {
+                if(i==a-1) {
+                    data=temp.getData();
+                    temp=temp.getLink();
+                }
+                else {
+
+                    temp=temp.getLink();
+                }
+            }
+        }
+        return data;
+    }
+
+    public int size() {
         int count = 0;
         if (head == null)
             System.out.println("linked list is empty");
         else {
             Node temp = head;
-            while (temp != null)
-            {
+            while (temp != null) {
                 count++;
                 temp = temp.getLink();
             }
@@ -51,20 +76,17 @@ public class SingleLinkedList {
         return count;
     }
 
-    public void delete(Object dataToDelete)
-    {
-        if(head == null)
+    public void delete(Object dataToDelete) {
+        if (head == null)
             System.out.println("linked list is empty");
         else {
-            while ((String)head.getData() == (String)dataToDelete)
+            while ((String) head.getData() == (String) dataToDelete)
                 head = head.getLink();
 
             Node temp = head;
             Node previous = null;
-            while(temp != null)
-            {
-                if((String)temp.getData() == (String)dataToDelete)
-                {
+            while (temp != null) {
+                if ((String) temp.getData() == (String) dataToDelete) {
                     previous.setLink(temp.getLink());
                     temp = previous;
                 }

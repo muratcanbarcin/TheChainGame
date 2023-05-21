@@ -1,35 +1,36 @@
+
 public class ColumnNode {
-    private String FirstItem;
+    private String categoryName;
     private ColumnNode down;
-    private RowNode right;
+    private ItemNode right;
 
     public ColumnNode(String dataToAdd) {
-        FirstItem = dataToAdd;
+        categoryName = dataToAdd;
         down = null;
         right = null;
     }
 
-    public String getFirstItem() {
-        return FirstItem;
+    public String getCategoryName () {
+        return categoryName;
     }
 
-    public ColumnNode getDown() {
+    public void setCategoryName (String data) {
+        this.categoryName = data;
+    }
+
+    public ColumnNode getDown () {
         return down;
     }
 
-    public RowNode getRight() {
-        return right;
-    }
-
-    public void setFirstItem(String data) {
-        this.FirstItem = data;
-    }
-
-    public void setDown(ColumnNode down) {
+    public void setDown (ColumnNode down) {
         this.down = down;
     }
 
-    public void setRight(RowNode right) {
+    public ItemNode getRight() {
+        return right;
+    }
+
+    public void setRight (ItemNode right) {
         this.right = right;
     }
 }
