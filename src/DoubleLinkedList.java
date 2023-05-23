@@ -1,9 +1,10 @@
+import java.util.Arrays;
+
 public class DoubleLinkedList {
     public DLLNode head;
     private DLLNode tail;
     private int size;
 
-    /*
     public void add(Object data) {
         DLLNode newNode = new DLLNode(data);
 
@@ -14,43 +15,6 @@ public class DoubleLinkedList {
             newNode.setPrev(tail);
             tail.setNext(newNode);
             tail = newNode;
-        }
-
-        size++;
-    }
-*/
-
-    public void addSorted(String name, int score) {
-        DLLNode newNode = new DLLNode(name + " " + score);
-
-        if (head == null) {
-            head = newNode;
-            tail = newNode;
-        } else if (score >= Integer.parseInt(tail.getData().toString().split(" ")[1])) {
-            newNode.setPrev(tail);
-            tail.setNext(newNode);
-            tail = newNode;
-        } else if (score <= Integer.parseInt(head.getData().toString().split(" ")[1])) {
-            newNode.setNext(head);
-            head.setPrev(newNode);
-            head = newNode;
-        } else {
-            DLLNode currentNode = head.getNext();
-
-            while (currentNode != null) {
-                int currentScore = Integer.parseInt(currentNode.getData().toString().split(" ")[1]);
-
-                if (score >= currentScore) {
-                    DLLNode prevNode = currentNode.getPrev();
-                    newNode.setPrev(prevNode);
-                    newNode.setNext(currentNode);
-                    prevNode.setNext(newNode);
-                    currentNode.setPrev(newNode);
-                    break;
-                }
-
-                currentNode = currentNode.getNext();
-            }
         }
 
         size++;
@@ -87,6 +51,63 @@ public class DoubleLinkedList {
             currentNode = currentNode.getNext();
         }
     }
+
+    public void display() {
+        DLLNode currentNode = head;
+
+        while (currentNode != null) {
+            System.out.print(currentNode.getData());
+            currentNode = currentNode.getNext();
+            System.out.println(" " + currentNode.getData());
+            currentNode = currentNode.getNext();
+        }
+    }
+
+    public void sorted() {
+        String[] name = new String[count() / 2];
+        int[] score = new int[count() / 2];
+        int countData = 0;
+        DLLNode currentNode = head;
+
+        while (currentNode != null) {
+            if (countData % 2 == 0) {
+                name[countData / 2] = (String) currentNode.getData();
+            } else {
+                score[(countData - 1) / 2] = Integer.parseInt(currentNode.getData().toString());
+            }
+
+            DLLNode nextNode = currentNode.getNext();
+            currentNode = nextNode;
+            countData++;
+        }
+
+        // Sıralama işlemi
+        for (int i = 0; i < score.length - 1; i++) {
+            for (int j = 0; j < score.length - 1 - i; j++) {
+                if (score[j] < score[j + 1]) {
+                    int temp = score[j];
+                    String temp2 =name[j];
+                    score[j] = score[j + 1];
+                    name[j] = name[j+1];
+                    name[j+1] = temp2;
+                    score[j + 1] = temp;
+                }
+            }
+        }
+        int sizeTemp = count();
+        deleteAll();
+        for(int i=0;i<(sizeTemp/2);i++){
+            add(name[i]);
+            add(score[i]);
+        }
+    }
+
+    public void deleteAll() {
+        head = null;
+        tail = null;
+        size = 0;
+    }
+
 
 
 
