@@ -3,6 +3,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import enigma.console.TextAttributes;
 import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -18,15 +21,16 @@ public class ChainGame {
     public static int seed = 0;
     public static boolean gameOver = false;
     public static int timeunit = 25;
-    DoubleLinkedList scoreTable = new DoubleLinkedList();
+    public static DoubleLinkedList HighScoreTable = new DoubleLinkedList();
     MultiLinkedList table = new MultiLinkedList();
     SingleLinkedList chain = new SingleLinkedList();
     Player p = new Player(15, 9);
     public static int round = 1;
     public static int score = 0;
     public static char[][] board = new char[19][31];;
+    public static String name =" ";
 
-    // ----------------------------------------------------
+            // ----------------------------------------------------
     ChainGame() throws Exception { // --- Contructor
         // ------ Standard code for mouse ------ Do not change
 
@@ -191,9 +195,25 @@ public class ChainGame {
         cn.getTextWindow().setCursorPosition(45, 18);
         cn.getTextWindow().output(reason, pink);
 
-        addToHST();
-        displayHST();
-
+        //HighScoreTable.txt read
+        String filePath = "highscoretable.txt";
+        String lineHigh;
+        //Split ile metotları ayırıp sonrasında SLL3 ve SLL4'e atamak
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            while ((lineHigh = br.readLine()) != null) {
+                String[] highScoreArr = lineHigh.split(" ");
+                HighScoreTable.add(highScoreArr[0]);
+                HighScoreTable.add(highScoreArr[1]);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        HighScoreTable.add(name);
+        HighScoreTable.add(score);
+        clear();
+        cn.getTextWindow().setCursorPosition(0,0);
+        HighScoreTable.sorted();
+        HighScoreTable.display();
     }
 
     public void printBoard() {
@@ -306,6 +326,10 @@ public class ChainGame {
         // Se�ilen se�enek �zerinde i�lem yap�labilir
         switch (selectedOption) {
             case 1:
+                clear();
+                cn.getTextWindow().output("İsim:");
+                name = cn.readLine();
+
                 // Play se�ene�i se�ildi�inde yap�lacak i�lemler
                 break;
             case 2:
@@ -331,6 +355,8 @@ public class ChainGame {
             case 3:
                 // High Score Table se�ene�i se�ildi�inde yap�lacak i�lemler
                 clear();
+
+                HighScoreTable.display();
                 cn.getTextWindow().setCursorPosition(0,0);
                 cn.getTextWindow().output("THE UNDER CONSTRUCTION :(");
                 cn.readLine();
@@ -343,13 +369,4 @@ public class ChainGame {
                 break;
         }
     }
-
-    public void addToHST() {
-        // scoreTable.add();
-    }
-
-    public void displayHST() {
-        //clear();
-    }
-
 }
