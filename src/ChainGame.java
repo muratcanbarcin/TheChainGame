@@ -24,9 +24,12 @@ public class ChainGame {
     SingleLinkedList chain = new SingleLinkedList();
     Player p = new Player(15, 9);
     public static int round = 1;
-    public static int score = 0;
+    public static int score = -1;
     public static char[][] board = new char[19][31];;
     public static String name =" ";
+    public static boolean exit = true;
+    public static String filePath = "highscoretable.txt";
+    public static String lineHigh;
 
             // ----------------------------------------------------
     ChainGame() throws Exception { // --- Contructor
@@ -45,13 +48,17 @@ public class ChainGame {
             }
         };
         cn.getTextWindow().addKeyListener(klis);
+        menu();
+        keypr = 0; // so that 'enter' key pressed to exit menu doesn't end the game
 
-        while (true){
-            menu();
-            keypr = 0; // so that 'enter' key pressed to exit menu doesn't end the game
+        clear(); // clear console
+        while (exit){
+            name =" ";
+            cn.getTextWindow().setCursorPosition(0,0);
+            cn.getTextWindow().output("İsim:");
+            name = cn.readLine();
 
-            clear(); // clear console
-
+            score =0;
             String reason = ""; // error reason
             int px = 15, py = 9; // player starts at the center
             int xdir = 0, ydir = 0; // for player movement
@@ -185,6 +192,7 @@ public class ChainGame {
                 }
 
                 Thread.sleep(timeunit);
+
             }
 
             cn.getTextWindow().setCursorPosition(45, 16);
@@ -194,35 +202,23 @@ public class ChainGame {
             cn.getTextWindow().setCursorPosition(45, 18);
             cn.getTextWindow().output(reason, pink);
 
-            //HighScoreTable.txt read
-            String filePath = "highscoretable.txt";
-            String lineHigh;
-            //Split ile metotları ayırıp sonrasında SLL3 ve SLL4'e atamak
-            try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-                while ((lineHigh = br.readLine()) != null) {
-                    String[] highScoreArr = lineHigh.split(" ");
-                    HighScoreTable.add(highScoreArr[0]);
-                    HighScoreTable.add(highScoreArr[1]);
+            if((!(name.equalsIgnoreCase(" ")))||score != -1){
+                try {
+                    BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true));
+                    writer.newLine();
+                    writer.write(name + " " + score);
+                    writer.close();
+                } catch (IOException e) {
+                    System.out.println("Dosyaya veri eklenirken bir hata oluştu: " + e.getMessage());
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
             }
 
-            try {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true));
-                writer.newLine();
-                writer.write(name + " " + score);
-                writer.close();
-            } catch (IOException e) {
-                System.out.println("Dosyaya veri eklenirken bir hata oluştu: " + e.getMessage());
-            }
-
-            HighScoreTable.add(name);
-            HighScoreTable.add(score);
             clear();
             cn.getTextWindow().setCursorPosition(0,0);
-            HighScoreTable.sorted();
-            HighScoreTable.display();
+            menu();
+            keypr = 0; // so that 'enter' key pressed to exit menu doesn't end the game
+
+            clear(); // clear console
         }
 
     }
@@ -337,10 +333,6 @@ public class ChainGame {
         // Se�ilen se�enek �zerinde i�lem yap�labilir
         switch (selectedOption) {
             case 1:
-                clear();
-                cn.getTextWindow().output("İsim:");
-                name = cn.readLine();
-
                 // Play se�ene�i se�ildi�inde yap�lacak i�lemler
                 break;
             case 2:
@@ -366,17 +358,32 @@ public class ChainGame {
             case 3:
                 // High Score Table se�ene�i se�ildi�inde yap�lacak i�lemler
                 clear();
-
-                HighScoreTable.display();
                 cn.getTextWindow().setCursorPosition(0,0);
-                cn.getTextWindow().output("THE UNDER CONSTRUCTION :(");
+
+                //HighScoreTable.txt read
+
+                //Split ile metotları ayırıp sonrasında SLL3 ve SLL4'e atamak
+                try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+                    while ((lineHigh = br.readLine()) != null) {
+                        String[] highScoreArr = lineHigh.split(" ");
+                        HighScoreTable.add(highScoreArr[0]);
+                        HighScoreTable.add(highScoreArr[1]);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                clear();
+                cn.getTextWindow().setCursorPosition(0,0);
+                HighScoreTable.sorted();
+                HighScoreTable.display();
+                cn.getTextWindow().output("Press enter to exit.");
                 cn.readLine();
-                break;
             case 4:
                 // Exit se�ene�i se�ildi�inde yap�lacak i�lemler
                 clear();
                 cn.getTextWindow().setCursorPosition(0,0);
                 cn.getTextWindow().output("You Exited the Game");
+                exit = false;
                 break;
         }
     }
