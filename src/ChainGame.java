@@ -11,86 +11,51 @@ public class ChainGame {
     public KeyListener klis;
     Scanner sc = new Scanner(System.in);
     TextAttributes green = new TextAttributes(Color.GREEN, Color.BLACK);
+    TextAttributes pink = new TextAttributes(Color.pink, Color.BLACK);
     // ------ Standard variables for keyboard ------
     public int keypr; // key pressed?
     public int rkey; // key (for press/release)
     public static int seed = 0;
-    MultiLinkedList table=new MultiLinkedList();
+    public static boolean gameOver = false;
+    public static int timeunit = 25;
+    DoubleLinkedList scoreTable = new DoubleLinkedList();
+    MultiLinkedList table = new MultiLinkedList();
     SingleLinkedList chain = new SingleLinkedList();
-    public static int enterCount=0;
+    Player p = new Player(15, 9);
+    public static int round = 1;
+    public static int score = 0;
+    public static char[][] board = new char[19][31];;
 
     // ----------------------------------------------------
     ChainGame() throws Exception { // --- Contructor
-        // ------ Standard code for mouse and keyboard ------ Do not change
+        // ------ Standard code for mouse ------ Do not change
 
         klis = new KeyListener() {
             public void keyTyped(KeyEvent e) {
             }
-
             public void keyPressed(KeyEvent e) {
                 if (keypr == 0) {
                     keypr = 1;
                     rkey = e.getKeyCode();
                 }
             }
-
             public void keyReleased(KeyEvent e) {
             }
         };
         cn.getTextWindow().addKeyListener(klis);
 
-        int score = 0;
-        int round = 1;
-        boolean gameOver = false;
-        System.out.print(" 0: Play \n 1: Enter seed and play \n 2: View high score table \n Enter your choice: ");
-        int choice = 0;
-        try {
-            choice = sc.nextInt();
-        } catch (Exception e) {
-        }
+        menu();
+        keypr = 0; // so that 'enter' key pressed to exit menu doesn't end the game
 
-        int seed = 0;
-        if (choice == 1) {
-            System.out.print(" Please enter a seed(integer) for the board: ");
-            try {
-                seed = sc.nextInt();
-            } catch (Exception e) {
-            }
-        }
-        if (choice == 2) {
-            // displayHST(); high-score table
-        }
+        clear(); // clear console
 
-        for (int i = 0; i < 5; i++) {
-            cn.getTextWindow().setCursorPosition(0, i);
-            cn.getTextWindow()
-                    .output("                                                                                ");
-        }
+        String reason = ""; // error reason
+        int px = 15, py = 9; // player starts at the center
+        int xdir = 0, ydir = 0; // for player movement
 
-        Random rnd = new Random(seed);
+        p.setX(px); p.setY(py);
 
-        int px = 15, py = 9;
-        int xdir = 0, ydir = 0;
-
-        boolean moved = false;
-
-        char[][] gamezone = new char[19][31];
-
-        chain = new SingleLinkedList();
-
-        Player p = new Player(px, py);
-
-        for (int i = 0; i < 19; i++) {
-            for (int j = 0; j < 31; j++) {
-                if (i % 2 == 0 && j % 2 == 0)
-                    gamezone[i][j] = (char) (1 + rnd.nextInt(4) + '0');
-                else
-                    gamezone[i][j] = ' ';
-                cn.getTextWindow().output(j, i, gamezone[i][j]);
-            }
-        }
-
-        cn.getTextWindow().output(px, py, 'P', green);
+        initializeBoard(p);
 
         cn.getTextWindow().setCursorPosition(35, 0);
         cn.getTextWindow().output("Board Seed: " + seed);
@@ -106,9 +71,7 @@ public class ChainGame {
         while (!gameOver) {
 
             if (keypr == 1) { // if keyboard button pressed
-                xdir = 0;
-                ydir = 0;
-                moved = false;
+                xdir = 0; ydir = 0;
                 if (rkey == KeyEvent.VK_LEFT && px > 0)
                     xdir = -1;
                 else if (rkey == KeyEvent.VK_RIGHT && px < 30)
@@ -118,163 +81,275 @@ public class ChainGame {
                 else if (rkey == KeyEvent.VK_DOWN && py < 18)
                     ydir = 1;
                 else if (rkey == KeyEvent.VK_SPACE) {
-                    if (gamezone[py][px] == '+') {
-                        cn.getTextWindow().output(px, py, 'P', green);
-                        gamezone[py][px] = ' ';
-                    } else if (gamezone[py][px] == ' ') {
-                        cn.getTextWindow().output(px, py, '+', green);
-                        gamezone[py][px] = '+';
+                    if (board[py][px] == '+') { // + turned into blank
+                        board[py][px] = 'P';
+                    } else if (board[py][px] == 'P') { // blank turned into +
+                        board[py][px] = '+';
                     }
                 } else if (rkey == KeyEvent.VK_ENTER) {
-                    int x = -1, y = -1; // start coordinates of chain
-                    int edgeC = 0;
-                    enterCount++;
+                    int x = -1, y = -1; // start/end coordinates of chain
+                    int edgeC = 0; // edge count
+                    int size = 0;
                     for (int i = 0; i < 19; i++) {
-                        for (int j = 0; j < 31; j++) {
-                            if (i % 2 == 1 && j % 2 == 1 && gamezone[i][j] == '+') // plus on wrong position
+                        for (int j = 0; j < 31; j++) { // checking chain for errors
+                            if (i % 2 == 1 && j % 2 == 1 && board[i][j] == '+') { // there should be no + in odd indexes
+                                reason = "+ sign on wrong pos.(crosswise a number)";
                                 gameOver = true;
-                            if (i % 2 == 0 && j % 2 == 0) {
+                            }
+                            else if (i % 2 == 0 && j % 2 == 0) {
                                 int plusC = 0;
-                                if (i > 0 && gamezone[i - 1][j] == '+') {
-                                    plusC++;
-                                }
-                                if (i < 18 && gamezone[i + 1][j] == '+') {
-                                    plusC++;
-                                }
-                                if (j > 0 && gamezone[i][j - 1] == '+') {
-                                    plusC++;
-                                }
-                                if (j < 30 && gamezone[i][j + 1] == '+') {
-                                    plusC++;
-                                }
+                                if (i > 0 && board[i - 1][j] == '+') plusC++; // top
+                                if (i < 18 && board[i + 1][j] == '+') plusC++; // bottom
+                                if (j > 0 && board[i][j - 1] == '+') plusC++; // left
+                                if (j < 30 && board[i][j + 1] == '+') plusC++; // right
                                 if (plusC == 1) { // start or end
-                                    x = j;
-                                    y = i;
+                                    x = j; y = i; // coordinates of start/end
                                     edgeC++;
-                                } else if (plusC > 2)
-                                    gameOver = true; // faulty chain
+                                    size++; // one element of chain found at board[i][j]
+                                } else if (plusC > 2) { // faulty chain
+                                    reason = "Connection w more than 2 + signs";
+                                    gameOver = true;
+                                } else if(plusC == 2) size++; // one element found at board[i][j]
                             }
                         }
                     }
 
-                    if (edgeC > 2 || edgeC == 0)
-                        gameOver = true; // more than 1 chain, no chain
+                    if (gameOver) break;
 
-                    if (x == -1 && y == -1) {
-                        gameOver = true;
-                    }
-
-                    if (gameOver)
+                    if (edgeC > 2) { // more than 2 start-end points found
+                        reason = "More than 1 chain";
                         break;
-
-                    boolean foundNeighbor = true;
-                    int prev = 1 + Character.getNumericValue(gamezone[y][x]);
-                    while (foundNeighbor) {
-
-                        if (Math.abs(prev - Character.getNumericValue(gamezone[y][x])) != 1) {
-                            gameOver = true;
-                            break;
-                        }
-
-                        chain.add(gamezone[y][x]);
-                        prev = Character.getNumericValue(gamezone[y][x]);
-
-                        // showing player the chain in green
-                        cn.getTextWindow().output(x, y, gamezone[y][x], green);
-
-                        gamezone[y][x] = '.';
-
-                        if (x + 2 < 31 && gamezone[y][x + 1] == '+' && gamezone[y][x + 2] != '.') { // right neighbor
-                            x += 2;
-                        } else if (x - 2 >= 0 && gamezone[y][x - 1] == '+' && gamezone[y][x - 2] != '.') { // left
-                            // neighbor
-                            x -= 2;
-                        } else if (y + 2 < 19 && gamezone[y + 1][x] == '+' && gamezone[y + 2][x] != '.') { // bottom
-                            // neighbor
-                            y += 2;
-                        } else if (y - 2 >= 0 && gamezone[y - 1][x] == '+' && gamezone[y - 2][x] != '.') { // top
-                            // neighbor
-                            y -= 2;
-                        } else
-                            foundNeighbor = false;
+                    }
+                    else if(edgeC == 0) { // no start-end found
+                        reason = "No chain";
+                        break;
+                    }
+                    else if(size < 4) { // using size instead chain.size() because chain isn't constructed yet
+                        // and if there is a difference error, we can't see the exact size of chain as it will be game over instantly
+                        reason = "Chain size insufficient("+size+" < 4)";
+                        break;
                     }
 
-                    Thread.sleep(500); // showing chain in screen before it turns into dots
+                    checkNeighbors(x, y); // checking differences between all elements of chain
 
-                    if (chain.size() < 4)
-                        break; // size insufficient
+                    if (gameOver) {  // if there was an error in checkNeighbors function
+                        reason = "Diff. of at least 2 neighbors != 1";
+                        break;
+                    }
 
-					/*if (round > 1)
-						cn.getTextWindow().output(35, 2 + 2 * round, '+'); // printing table (not MLL yet)
-					cn.getTextWindow().setCursorPosition(35, 3 + 2 * round);
-					chain.display();*/
                     addTable();
-                    //cn.getTextWindow().setCursorPosition(35,5);
+
                     table.display(cn);
 
-                    // calculate score and make chain into dots on board, add to table
+                    for (int i = 0; i < 19; i++)
+                        for (int j = 0; j < 31; j++)
+                            if (board[i][j] == '+') board[i][j] = ' '; // new round, plus signs reset
+
                     score += chain.size() * chain.size();
                     round++;
-                    for (int i = 0; i < 19; i++) {
-                        for (int j = 0; j < 31; j++) {
-                            if (gamezone[i][j] == '+')
-                                gamezone[i][j] = ' ';
-                            cn.getTextWindow().output(j, i, gamezone[i][j]);
-                        }
-                    }
-                    cn.getTextWindow().output(px, py, 'P', green);
+
+                    chain = null;
                     chain = new SingleLinkedList(); // reset chain
                 }
 
-                if (gamezone[py + ydir][px + xdir] == ' ' && (xdir != 0 || ydir != 0)) {
-                    px += xdir;
-                    py += ydir;
-                    moved = true;
-                    p.setX(px);
-                    p.setY(py);
-                    cn.getTextWindow().output(px, py, 'P', green);
-                } else if (gamezone[py + ydir][px + xdir] == '+' && (xdir != 0 || ydir != 0)) {
-                    px += xdir;
-                    py += ydir;
-                    moved = true;
-                    p.setX(px);
-                    p.setY(py);
-                    cn.getTextWindow().output(px, py, '+', green);
+                if (board[py + ydir][px + xdir] == ' ') { // can move to blank spot
+                    if(board[py][px] != '+') board[py][px] = ' '; //  prev. location, if not +, turned into blank
+                    px += xdir; py += ydir;
+                    board[py][px] = 'P'; // P is at the blank spot
+
+                } else if (board[py + ydir][px + xdir] == '+') {	// can move to + sign
+                    if(board[py][px] != '+') board[py][px] = ' '; // prev. location, if not +, turned into blank
+                    px += xdir; py += ydir;
+                    board[py][px] = '+'; // P is here along with + sign, + prioritized
+
+                } else if (!((py < 2 && ydir == -1) || (py > 16 && ydir == 1) || (px < 2 && xdir == -1) || (px > 28 && xdir == 1))) {
+                    // jump to roam the board faster
+                    if(board[py][px] != '+') board[py][px] = ' ';
+                    px += 2*xdir; py += 2*ydir;
+                    board[py][px] = (board[py][px] == ' ') ? 'P' : '+';  // if new location is blank, it is now p / if it's +, it stays so. + is prioritized
                 }
 
-                if (moved) {
-                    if (gamezone[py - ydir][px - xdir] == ' ') {
-                        cn.getTextWindow().output(px - xdir, py - ydir, ' ');
-                    } else if (gamezone[py - ydir][px - xdir] == '+') {
-                        cn.getTextWindow().output(px - xdir, py - ydir, '+');
-                    }
-                }
+                p.setX(px); p.setY(py);
+
+                printBoard(); // every time unit, game board is printed to visually update the game
+
+                cn.getTextWindow().setCursorPosition(47, 1);
+                System.out.print(round);
+                cn.getTextWindow().setCursorPosition(47, 2);
+                System.out.print(score);
 
                 keypr = 0;
             }
 
-            cn.getTextWindow().setCursorPosition(47, 1);
-            System.out.print(round);
-            cn.getTextWindow().setCursorPosition(47, 2);
-            System.out.print(score);
-
-            Thread.sleep(50);
-
+            Thread.sleep(timeunit);
         }
 
-        cn.getTextWindow().setCursorPosition(35, 16);
+        cn.getTextWindow().setCursorPosition(45, 16);
         cn.getTextWindow().output("Error in chain");
-        cn.getTextWindow().setCursorPosition(35, 17);
+        cn.getTextWindow().setCursorPosition(45, 17);
         cn.getTextWindow().output("- Game Over -");
+        cn.getTextWindow().setCursorPosition(45, 18);
+        cn.getTextWindow().output(reason, pink);
 
+        addToHST();
+        displayHST();
+
+    }
+
+    public void printBoard() {
+        for (int i = 0; i < 19; i++) {
+            for (int j = 0; j < 31; j++) {
+                if(board[i][j] == 'P' || (board[i][j] == '+' && i==p.getY() && j==p.getX()))
+                    cn.getTextWindow().output(j, i, board[i][j], green); // print P or + green when P is on a + sign
+                else cn.getTextWindow().output(j, i, board[i][j]); // print def color
+
+            }
+        }
+    }
+
+    public void checkNeighbors(int x, int y) {
+        boolean foundNeighbor = true;
+        int prev = 1 + Character.getNumericValue(board[y][x]); // previous element in chain
+        while (foundNeighbor) {
+
+            if (Math.abs(prev - Character.getNumericValue(board[y][x])) != 1) { // difference should be -1 or 1
+                gameOver = true;
+                return; // so that it doesn't go on unnecessarily, main while loop will break below the line of call
+            }
+
+            chain.add(board[y][x]); // found correct element added to chain
+
+            prev = Character.getNumericValue(board[y][x]);
+
+            board[y][x] = '.'; // checked part of the chain turned into dot
+            // traversing connected elements till no more can be found
+            if (x + 2 < 31 && board[y][x + 1] == '+' && board[y][x + 2] != '.') { // right neighbor
+                x += 2;
+            } else if (x - 2 >= 0 && board[y][x - 1] == '+' && board[y][x - 2] != '.') { // left																											// neighbor
+                x -= 2;
+            } else if (y + 2 < 19 && board[y + 1][x] == '+' && board[y + 2][x] != '.') { // bottom																										// neighbor
+                y += 2;
+            } else if (y - 2 >= 0 && board[y - 1][x] == '+' && board[y - 2][x] != '.') { // top																											// neighbor
+                y -= 2;
+            } else
+                foundNeighbor = false;
+        }
     }
 
     public void addTable() {
         int size=chain.size();
-        table.addCategory(String.valueOf(enterCount));
+        table.addCategory(String.valueOf(round));
         for (int i = 1; i < size+1; i++) {
-            table.addItem(String.valueOf(enterCount), String.valueOf(chain.findData(i)));
+            table.addItem(String.valueOf(round), String.valueOf(chain.findData(i)));
         }
+    }
+
+    public void clear() {
+        for (int i = 0; i < cn.getTextWindow().getRows(); i++)
+            for (int j = 0; j < cn.getTextWindow().getColumns(); j++)
+                cn.getTextWindow().output(j, i, ' ');
+    }
+
+    public void initializeBoard(Player p) {
+        Random rnd = new Random(seed);
+        for (int i = 0; i < 19; i++) {
+            for (int j = 0; j < 31; j++) {
+                if (i % 2 == 0 && j % 2 == 0) board[i][j] = (char) (1 + rnd.nextInt(4) + '0');
+                else board[i][j] = ' ';
+                cn.getTextWindow().output(j, i, board[i][j]);
+            }
+        }
+        board[p.getY()][p.getX()] = 'P'; cn.getTextWindow().output(p.getX(), p.getY(), 'P', green); // p put on board/printed
+    }
+
+    public void menu() {
+        int selectedOption = 1; // Se�ili olan se�ene�i tutan de�i�ken
+        boolean menuSelected = false; // Men� se�ildi mi?
+
+        while (!menuSelected) {
+            cn.getTextWindow().setCursorPosition(0, 0);
+            cn.getTextWindow().output("  Play");
+            cn.getTextWindow().setCursorPosition(0, 1);
+            cn.getTextWindow().output("  Settings");
+            cn.getTextWindow().setCursorPosition(0, 2);
+            cn.getTextWindow().output("  High Score Table");
+            cn.getTextWindow().setCursorPosition(0, 3);
+            cn.getTextWindow().output("  Exit");
+
+            cn.getTextWindow().setCursorPosition(0, selectedOption - 1);
+            cn.getTextWindow().output("->", green);
+
+            keypr = 0;
+            while (keypr == 0) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (rkey == KeyEvent.VK_DOWN) {
+                selectedOption++;
+                if (selectedOption > 4) {
+                    selectedOption = 1;
+                }
+            } else if (rkey == KeyEvent.VK_UP) {
+                selectedOption--;
+                if (selectedOption < 1) {
+                    selectedOption = 4;
+                }
+            } else if (rkey == KeyEvent.VK_ENTER) {
+                menuSelected = true;
+            }
+        }
+
+        // Se�ilen se�enek �zerinde i�lem yap�labilir
+        switch (selectedOption) {
+            case 1:
+                // Play se�ene�i se�ildi�inde yap�lacak i�lemler
+                break;
+            case 2:
+                // Settings se�ene�i se�ildi�inde yap�lacak i�lemler
+                clear();
+                cn.getTextWindow().setCursorPosition(0,0);
+                cn.getTextWindow().output("Seed:");
+                try {
+                    seed = sc.nextInt();
+                }
+                catch(Exception e) {}
+
+                cn.getTextWindow().output("\n \nTime Unit(25(ms)-1000(ms)):");
+                try {
+                    while (!(timeunit>25 && timeunit<1000))
+                    {
+                        timeunit = sc.nextInt();
+                    }
+                }
+                catch(Exception e) {}
+
+                break;
+            case 3:
+                // High Score Table se�ene�i se�ildi�inde yap�lacak i�lemler
+                clear();
+                cn.getTextWindow().setCursorPosition(0,0);
+                cn.getTextWindow().output("THE UNDER CONSTRUCTION :(");
+                cn.readLine();
+                break;
+            case 4:
+                // Exit se�ene�i se�ildi�inde yap�lacak i�lemler
+                clear();
+                cn.getTextWindow().setCursorPosition(0,0);
+                cn.getTextWindow().output("You Exited the Game");
+                break;
+        }
+    }
+
+    public void addToHST() {
+        // scoreTable.add();
+    }
+
+    public void displayHST() {
+        //clear();
     }
 
 }
