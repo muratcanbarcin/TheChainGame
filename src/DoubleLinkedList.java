@@ -55,7 +55,7 @@ public class DoubleLinkedList {
 
         size++;
     }
-    
+
     public int count() {
         return size;
     }
