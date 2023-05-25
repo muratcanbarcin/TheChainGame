@@ -18,7 +18,7 @@ public class ChainGame {
     public int rkey; // key (for press/release)
     public static int seed = 0;
     public static boolean gameOver = false;
-    public static int timeunit = 25;
+    public static int timeunit = 20;
     public static DoubleLinkedList HighScoreTable = new DoubleLinkedList();
     MultiLinkedList table = new MultiLinkedList();
     SingleLinkedList chain = new SingleLinkedList();
@@ -31,7 +31,7 @@ public class ChainGame {
     public static String filePath = "highscoretable.txt";
     public static String lineHigh;
 
-            // ----------------------------------------------------
+    // ----------------------------------------------------
     ChainGame() throws Exception { // --- Contructor
         // ------ Standard code for mouse ------ Do not change
 
@@ -53,10 +53,11 @@ public class ChainGame {
 
         clear(); // clear console
         while (exit){
-            name =" ";
+            name = " ";
             cn.getTextWindow().setCursorPosition(0,0);
-            cn.getTextWindow().output("İsim:");
+            cn.getTextWindow().output("Name:");
             name = cn.readLine();
+            keypr = 0;
 
             score =0;
             String reason = ""; // error reason
@@ -128,15 +129,18 @@ public class ChainGame {
 
                         if (edgeC > 2) { // more than 2 start-end points found
                             reason = "More than 1 chain";
+                            gameOver = true;
                             break;
                         }
                         else if(edgeC == 0) { // no start-end found
                             reason = "No chain";
+                            gameOver = true;
                             break;
                         }
                         else if(size < 4) { // using size instead chain.size() because chain isn't constructed yet
                             // and if there is a difference error, we can't see the exact size of chain as it will be game over instantly
                             reason = "Chain size insufficient("+size+" < 4)";
+                            gameOver = true;
                             break;
                         }
 
@@ -158,8 +162,10 @@ public class ChainGame {
                         score += chain.size() * chain.size();
                         round++;
 
-                        chain = null;
                         chain = new SingleLinkedList(); // reset chain
+
+                    } else if(rkey == KeyEvent.VK_E) {
+                        break;
                     }
 
                     if (board[py + ydir][px + xdir] == ' ') { // can move to blank spot
@@ -195,14 +201,24 @@ public class ChainGame {
 
             }
 
-            cn.getTextWindow().setCursorPosition(45, 16);
-            cn.getTextWindow().output("Error in chain");
-            cn.getTextWindow().setCursorPosition(45, 17);
-            cn.getTextWindow().output("- Game Over -");
-            cn.getTextWindow().setCursorPosition(45, 18);
-            cn.getTextWindow().output(reason, pink);
+            if(gameOver) { // there was an error (user didn't exit mid-game)
+                cn.getTextWindow().setCursorPosition(45, 16);
+                cn.getTextWindow().output("Error in chain");
+                cn.getTextWindow().setCursorPosition(45, 17);
+                cn.getTextWindow().output("- Game Over -");
+                cn.getTextWindow().setCursorPosition(45, 18);
+                cn.getTextWindow().output(reason, pink);
+                cn.getTextWindow().setCursorPosition(45, 19);
+                cn.getTextWindow().output("Press E to exit", green);
+                while (rkey != KeyEvent.VK_E) {
+                    Thread.sleep(50);
+                    keypr=0;
+                }
+            }
+            gameOver = false;
 
-            if((!(name.equalsIgnoreCase(" ")))||score != -1){
+            table = new MultiLinkedList();
+            if(!((name.trim().equalsIgnoreCase("")) || score == -1)) {
                 try {
                     BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true));
                     writer.newLine();
@@ -212,6 +228,27 @@ public class ChainGame {
                     System.out.println("Dosyaya veri eklenirken bir hata oluştu: " + e.getMessage());
                 }
             }
+            cn.getTextWindow().setCursorPosition(0,0);
+            //Ayırıp sonrasında SLL3 ve SLL4'e atamak
+            HighScoreTable = new DoubleLinkedList();
+            try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+                while ((lineHigh = br.readLine()) != null) {
+                    String strName = lineHigh.substring(0, lineHigh.lastIndexOf(" ")).trim();
+                    String strNumber = lineHigh.substring(lineHigh.lastIndexOf(" ") + 1);
+                    HighScoreTable.add(strName);
+                    HighScoreTable.add(strNumber);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            clear();
+            cn.getTextWindow().setCursorPosition(0,0);
+            HighScoreTable.sorted();
+            HighScoreTable.display();
+
+            cn.getTextWindow().setCursorPosition(45,20);
+            cn.getTextWindow().output("Press enter to return to menu", green);
+            cn.readLine();
 
             clear();
             cn.getTextWindow().setCursorPosition(0,0);
@@ -290,8 +327,8 @@ public class ChainGame {
     }
 
     public void menu() {
-        int selectedOption = 1; // Se�ili olan se�ene�i tutan de�i�ken
-        boolean menuSelected = false; // Men� se�ildi mi?
+        int selectedOption = 1; // Seçili olan seçeneği tutan değişken
+        boolean menuSelected = false; // Menü seçildi mi?
 
         while (!menuSelected) {
             cn.getTextWindow().setCursorPosition(0, 0);
@@ -330,13 +367,13 @@ public class ChainGame {
             }
         }
 
-        // Se�ilen se�enek �zerinde i�lem yap�labilir
+        // Seçilen seçenek üzerinde işlem yapılabilir
         switch (selectedOption) {
             case 1:
-                // Play se�ene�i se�ildi�inde yap�lacak i�lemler
+                // Play seçeneği seçildiğinde yapılacak işlemler
                 break;
             case 2:
-                // Settings se�ene�i se�ildi�inde yap�lacak i�lemler
+                // Settings seçeneği seçildiğinde yapılacak işlemler
                 clear();
                 cn.getTextWindow().setCursorPosition(0,0);
                 cn.getTextWindow().output("Seed:");
@@ -347,7 +384,7 @@ public class ChainGame {
 
                 cn.getTextWindow().output("\n \nTime Unit(25(ms)-1000(ms)):");
                 try {
-                    while (!(timeunit>25 && timeunit<1000))
+                    while (!(timeunit>=25 && timeunit<=1000))
                     {
                         timeunit = sc.nextInt();
                     }
@@ -356,18 +393,19 @@ public class ChainGame {
 
                 break;
             case 3:
-                // High Score Table se�ene�i se�ildi�inde yap�lacak i�lemler
+                // High Score Table seçeneği seçildiğinde yapılacak işlemler
                 clear();
                 cn.getTextWindow().setCursorPosition(0,0);
 
                 //HighScoreTable.txt read
-
-                //Split ile metotları ayırıp sonrasında SLL3 ve SLL4'e atamak
+                HighScoreTable = new DoubleLinkedList();
+                //Ayırıp sonrasında SLL3 ve SLL4'e atamak
                 try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
                     while ((lineHigh = br.readLine()) != null) {
-                        String[] highScoreArr = lineHigh.split(" ");
-                        HighScoreTable.add(highScoreArr[0]);
-                        HighScoreTable.add(highScoreArr[1]);
+                        String strName = lineHigh.substring(0, lineHigh.lastIndexOf(" ")).trim();
+                        String strNumber = lineHigh.substring(lineHigh.lastIndexOf(" ") + 1);
+                        HighScoreTable.add(strName);
+                        HighScoreTable.add(strNumber);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -376,10 +414,10 @@ public class ChainGame {
                 cn.getTextWindow().setCursorPosition(0,0);
                 HighScoreTable.sorted();
                 HighScoreTable.display();
-                cn.getTextWindow().output("Press enter to exit.");
+                cn.getTextWindow().output("\nPress enter to exit.");
                 cn.readLine();
             case 4:
-                // Exit se�ene�i se�ildi�inde yap�lacak i�lemler
+                // Exit seçeneği seçildiğinde yapılacak işlemler
                 clear();
                 cn.getTextWindow().setCursorPosition(0,0);
                 cn.getTextWindow().output("You Exited the Game");
