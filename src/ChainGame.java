@@ -59,7 +59,10 @@ public class ChainGame {
             name = cn.readLine();
             keypr = 0;
 
-            score =0;
+            clear();
+            gameOver = false;
+            round = 1;
+            score = 0;
             String reason = ""; // error reason
             int px = 15, py = 9; // player starts at the center
             int xdir = 0, ydir = 0; // for player movement
@@ -215,7 +218,6 @@ public class ChainGame {
                     keypr=0;
                 }
             }
-            gameOver = false;
 
             table = new MultiLinkedList();
             if(!((name.trim().equalsIgnoreCase("")) || score == -1)) {
@@ -233,10 +235,12 @@ public class ChainGame {
             HighScoreTable = new DoubleLinkedList();
             try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
                 while ((lineHigh = br.readLine()) != null) {
-                    String strName = lineHigh.substring(0, lineHigh.lastIndexOf(" ")).trim();
-                    String strNumber = lineHigh.substring(lineHigh.lastIndexOf(" ") + 1);
-                    HighScoreTable.add(strName);
-                    HighScoreTable.add(strNumber);
+                    if(!lineHigh.isEmpty()) {
+                        String strName = lineHigh.substring(0, lineHigh.lastIndexOf(" ")).trim();
+                        String strScore = lineHigh.substring(lineHigh.lastIndexOf(" ") + 1);
+                        HighScoreTable.add(strName);
+                        HighScoreTable.add(strScore);
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -384,10 +388,7 @@ public class ChainGame {
 
                 cn.getTextWindow().output("\n \nTime Unit(25(ms)-1000(ms)):");
                 try {
-                    while (!(timeunit>=25 && timeunit<=1000))
-                    {
-                        timeunit = sc.nextInt();
-                    }
+                    do { timeunit = sc.nextInt(); }  while (!(timeunit>=25 && timeunit<=1000));
                 }
                 catch(Exception e) {}
 
@@ -402,10 +403,12 @@ public class ChainGame {
                 //Ayırıp sonrasında SLL3 ve SLL4'e atamak
                 try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
                     while ((lineHigh = br.readLine()) != null) {
-                        String strName = lineHigh.substring(0, lineHigh.lastIndexOf(" ")).trim();
-                        String strNumber = lineHigh.substring(lineHigh.lastIndexOf(" ") + 1);
-                        HighScoreTable.add(strName);
-                        HighScoreTable.add(strNumber);
+                        if(!lineHigh.isEmpty()) {
+                            String strName = lineHigh.substring(0, lineHigh.lastIndexOf(" ")).trim();
+                            String strNumber = lineHigh.substring(lineHigh.lastIndexOf(" ") + 1);
+                            HighScoreTable.add(strName);
+                            HighScoreTable.add(strNumber);
+                        }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -416,13 +419,10 @@ public class ChainGame {
                 HighScoreTable.display();
                 cn.getTextWindow().output("\nPress enter to exit.");
                 cn.readLine();
+                System.exit(0);
             case 4:
                 // Exit seçeneği seçildiğinde yapılacak işlemler
-                clear();
-                cn.getTextWindow().setCursorPosition(0,0);
-                cn.getTextWindow().output("You Exited the Game");
-                exit = false;
-                break;
+                System.exit(0);
         }
     }
 }
